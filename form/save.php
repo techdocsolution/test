@@ -1,8 +1,16 @@
-<?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $file = 'contact_details.txt';
-    file_put_contents($file, $data['contactDetails'] . PHP_EOL, FILE_APPEND);
-    echo json_encode(["status" => "success"]);
-}
-?>
+<!-- modify this form HTML and place wherever you want your form -->
+<form
+  action="https://formspree.io/f/xqaagrww"
+  method="POST"
+>
+  <label>
+    Your email:
+    <input type="email" name="email">
+  </label>
+  <label>
+    Your message:
+    <textarea name="message"></textarea>
+  </label>
+  <!-- your other form fields go here -->
+  <button type="submit">Send</button>
+</form>

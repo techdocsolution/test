@@ -8,6 +8,7 @@ body {
     height: 100vh;
     background-color: #f4f4f9;
 }
+
 #app {
     max-width: 600px;
     padding: 20px;
@@ -16,9 +17,30 @@ body {
     border-radius: 10px;
     text-align: center;
 }
-#form-container, #document-container {
-    margin-top: 20px;
+
+h1 {
+    margin-bottom: 20px;
 }
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+input, select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+
 button {
     padding: 10px 20px;
     background-color: #007BFF;
@@ -27,6 +49,7 @@ button {
     border-radius: 5px;
     cursor: pointer;
 }
+
 button:hover {
     background-color: #0056b3;
 }
