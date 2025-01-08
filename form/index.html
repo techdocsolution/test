@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Interview Form</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <h1>Interactive Interview</h1>
+        <div id="form-container">
+            <form id="interview-form">
+                <div id="question-container">
+                    <!-- Questions will dynamically appear here -->
+                </div>
+                <button type="button" id="next-btn">Next</button>
+            </form>
+        </div>
+        <div id="document-container" style="display:none;">
+            <h2>Recommended Documents</h2>
+            <ul id="document-list">
+                <!-- Dynamic documents -->
+            </ul>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
