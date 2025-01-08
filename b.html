@@ -55,8 +55,12 @@
 </head>
 <body>
   <div class="container" id="app">
-    <div class="question" id="question">Welcome! Let's get started.</div>
-    <div class="options" id="options"></div>
+    <div class="question" id="question">Enter your name and surname to begin:</div>
+    <div class="options" id="options">
+      <input type="text" id="name" placeholder="Name" style="width: 100%; margin-bottom: 10px; padding: 10px; font-size: 1em;" />
+      <input type="text" id="surname" placeholder="Surname" style="width: 100%; margin-bottom: 10px; padding: 10px; font-size: 1em;" />
+      <button onclick="startQuestionnaire()" style="width: 100%; padding: 10px; font-size: 1em; background: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">Start</button>
+    </div>
     <div class="summary" id="summary" style="display: none;"></div>
   </div>
 
@@ -65,6 +69,12 @@
     const questionEl = document.getElementById('question');
     const optionsEl = document.getElementById('options');
     const summaryEl = document.getElementById('summary');
+
+    let userName = '';
+    let userSurname = '';
+    const answers = [];
+    const requiredDocuments = [];
+    let currentQuestion = 0;
 
     const questions = [
       {
@@ -152,9 +162,17 @@
       }
     ];
 
-    const answers = [];
-    const requiredDocuments = [];
-    let currentQuestion = 0;
+    function startQuestionnaire() {
+      userName = document.getElementById('name').value;
+      userSurname = document.getElementById('surname').value;
+
+      if (!userName || !userSurname) {
+        alert('Please enter both your name and surname to continue.');
+        return;
+      }
+
+      loadQuestion();
+    }
 
     function loadQuestion() {
       if (currentQuestion < questions.length) {
@@ -214,7 +232,8 @@
       optionsEl.style.display = 'none';
       summaryEl.style.display = 'block';
 
-      let summaryText = "<strong>Your Answers:</strong><br><ul>";
+      let summaryText = `<strong>Name:</strong> ${userName}<br><strong>Surname:</strong> ${userSurname}<br><br>`;
+      summaryText += "<strong>Your Answers:</strong><br><ul>";
       answers.forEach((answer, index) => {
         summaryText += `<li>${questions[index].question} <strong>${answer}</strong></li>`;
       });
@@ -227,7 +246,22 @@
       });
       summaryText += "</ul>";
 
+      summaryText += `<button onclick="downloadSummary()" style="margin-top: 20px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Download Summary</button>`;
+
       summaryEl.innerHTML = summaryText;
+    }
+
+    function downloadSummary() {
+      const data = `Name: ${userName}\nSurname: ${userSurname}\n\nAnswers:\n` +
+        answers.map((answer, index) => `${questions[index].question}: ${answer}`).join("\n") +
+        "\n\nRequired Documents:\n" +
+        [...new Set(requiredDocuments)].join("\n");
+
+      const blob = new Blob([data], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'summary.txt';
+      link.click();
     }
 
     loadQuestion();
