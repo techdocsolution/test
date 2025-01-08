@@ -193,8 +193,9 @@
         button.textContent = option;
         button.onclick = () => {
           answers.push(option);
-          requiredDocuments.push(...options[option]);
-          currentQuestion++;
+          if (Array.isArray(options[option])) {
+            requiredDocuments.push(...options[option]);
+          }
           loadQuestion();
         };
         optionsEl.appendChild(button);
