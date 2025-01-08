@@ -11,28 +11,10 @@
         <h1>Interactive Interview</h1>
         <form action="https://formspree.io/f/xqaagrww" method="POST" id="interview-form">
             <div id="question-container">
-                <div class="question">
-                    <label for="name">What is your name?</label>
-                    <input type="text" name="name" id="name" placeholder="Your Name" required />
-                </div>
-                <div class="question">
-                    <label for="email">What is your email?</label>
-                    <input type="email" name="email" id="email" placeholder="Your Email" required />
-                </div>
-                <div class="question">
-                    <label for="phone">What is your phone number?</label>
-                    <input type="tel" name="phone" id="phone" placeholder="Your Phone Number" required />
-                </div>
-                <div class="question">
-                    <label for="document">What type of document do you need?</label>
-                    <select name="document" id="document" required>
-                        <option value="Passport">Passport</option>
-                        <option value="Driver's License">Driver's License</option>
-                        <option value="ID Card">ID Card</option>
-                    </select>
-                </div>
+                <!-- Questions will appear dynamically -->
             </div>
-            <button type="submit">Submit</button>
+            <button type="button" id="next-btn">Next</button>
+            <button type="submit" id="submit-btn" style="display:none;">Submit</button>
         </form>
     </div>
     <script src="script.js"></script>

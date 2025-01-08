@@ -33,7 +33,7 @@ label {
     margin-bottom: 5px;
 }
 
-input, select {
+input, select, button {
     padding: 10px;
     font-size: 1rem;
     border: 1px solid #ccc;
@@ -42,11 +42,9 @@ input, select {
 }
 
 button {
-    padding: 10px 20px;
     background-color: #007BFF;
     color: white;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
 }
 
