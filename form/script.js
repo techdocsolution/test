@@ -6,9 +6,9 @@ const questions = [
         validate: (answer) => {
             if (answer === "C or above") {
                 alert("You are not qualified.");
-                document.getElementById("next-btn").style.display = "none";
+                return false; // Stops progression if not qualified
             }
-            return answer !== "C or above";
+            return true;
         },
     },
     {
@@ -27,9 +27,9 @@ const questions = [
         placeholder: "Enter your annual income in GBP",
         validate: (answer) => {
             if (parseInt(answer) < 31000) {
-                return "Required: Bank statement.";
+                alert("Required: Bank statement.");
             }
-            return null;
+            return true; // Allow progression even if condition is met
         },
     },
 ];
@@ -42,10 +42,10 @@ const nextButton = document.getElementById("next-btn");
 const submitButton = document.getElementById("submit-btn");
 
 function showQuestion(index) {
-    questionContainer.innerHTML = "";
+    questionContainer.innerHTML = ""; // Clear previous question
 
     if (index >= questions.length) {
-        prepareSubmission();
+        prepareSubmission(); // Show the submission page
         return;
     }
 
@@ -84,6 +84,16 @@ function prepareSubmission() {
         p.textContent = `${key}: ${responses[key]}`;
         questionContainer.appendChild(p);
     });
+
+    // Add responses as hidden inputs for email submission
+    const form = document.getElementById("interview-form");
+    Object.keys(responses).forEach((key) => {
+        const hiddenInput = document.createElement("input");
+        hiddenInput.type = "hidden";
+        hiddenInput.name = key;
+        hiddenInput.value = responses[key];
+        form.appendChild(hiddenInput);
+    });
 }
 
 nextButton.addEventListener("click", () => {
@@ -99,7 +109,7 @@ nextButton.addEventListener("click", () => {
     responses[question.question] = answer;
 
     if (question.validate && !question.validate(answer)) {
-        return;
+        return; // Stop if validation fails
     }
 
     if (question.additionalInfo && question.additionalInfo[answer]) {
@@ -107,7 +117,8 @@ nextButton.addEventListener("click", () => {
     }
 
     currentQuestionIndex++;
-    showQuestion(currentQuestionIndex);
+    showQuestion(currentQuestionIndex); // Show the next question
 });
 
+// Initialize the first question
 showQuestion(currentQuestionIndex);
