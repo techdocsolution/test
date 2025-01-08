@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Eligibility Questionnaire</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+    .options {
+      margin-bottom: 20px;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 1em;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .options button:hover {
+      background: #0056b3;
+    }
+    .summary {
+      font-size: 1.1em;
+      background: #e8f4ff;
+      padding: 15px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <div class="question" id="question">Enter your name and surname to begin:</div>
+    <div class="options" id="options">
+      <input type="text" id="name" placeholder="Name" style="width: 100%; margin-bottom: 10px; padding: 10px; font-size: 1em;" />
+      <input type="text" id="surname" placeholder="Surname" style="width: 100%; margin-bottom: 10px; padding: 10px; font-size: 1em;" />
+      <button onclick="startQuestionnaire()" style="width: 100%; padding: 10px; font-size: 1em; background: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">Start</button>
+    </div>
+    <div class="summary" id="summary" style="display: none;"></div>
+  </div>
+
+  <script>
+    const app = document.getElementById('app');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const summaryEl = document.getElementById('summary');
+
+    let userName = '';
+    let userSurname = '';
+    const answers = [];
+    const requiredDocuments = [];
+    let currentQuestion = 0;
+
+    const questions = [
+      {
+        question: "What is the EPC rating of your house?",
+        options: {
+          "C or above": "You are not qualified under any circumstances.",
+          "D": [],
+          "E": [],
+          "F": [],
+          "G": []
+        },
+        nextIf: (answer) => {
+          if (answer === "C or above") {
+            showDisqualificationMessage();
+            return false;
+          }
+          return true;
+        }
+      },
+      {
+        question: "What is the status of your home?",
+        options: {
+          "Social rented": ["EPC rating of D-G", "Verification for property rented below market rate"],
+          "Private rented": ["Permission from landlord", "EPC rating E-G"],
+          "Owner": ["EPC rating of D-G"]
+        }
+      },
+      {
+        question: "What is your income?",
+        options: {
+          "Below £31,000": ["Bank statement"],
+          "Above £31,000": []
+        }
+      },
+      {
+        question: "Do you have NHS referral?",
+        options: {
+          "Yes": ["Declaration from doctor"],
+          "No": []
+        }
+      },
+      {
+        question: "Do you live in LSOA?",
+        options: {
+          "Yes": ["Council tax bill"],
+          "No": []
+        }
+      },
+      {
+        question: "Did you get a tax reduction?",
+        options: {
+          "Yes": ["Tax bill"],
+          "No": []
+        }
+      },
+      {
+        question: "Are you or your household vulnerable to cold?",
+        options: {
+          "Yes": {
+            subQuestion: "What type of vulnerability?",
+            options: {
+              "Cardio condition": ["Hospital letter"],
+              "Disabled": ["DLA award notice"],
+              "65 or above": ["Passport"],
+              "Age 5 or less": ["Child passport"],
+              "Pregnant": ["MAT B1 form"]
+            }
+          },
+          "No": []
+        }
+      },
+      {
+        question: "Do you have a child that gets free meals at school?",
+        options: {
+          "Yes": ["Letter from school"],
+          "No": []
+        }
+      },
+      {
+        question: "Are you struggling to pay bills?",
+        options: {
+          "Yes": ["Referral letter"],
+          "No": []
+        }
+      }
+    ];
+
+    function startQuestionnaire() {
+      userName = document.getElementById('name').value;
+      userSurname = document.getElementById('surname').value;
+
+      if (!userName || !userSurname) {
+        alert('Please enter both your name and surname to continue.');
+        return;
+      }
+
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentQuestion < questions.length) {
+        const current = questions[currentQuestion];
+        questionEl.textContent = current.question;
+        optionsEl.innerHTML = '';
+
+        Object.keys(current.options).forEach((option) => {
+          const button = document.createElement('button');
+          button.textContent = option;
+          button.onclick = () => {
+            answers.push(option);
+            if (Array.isArray(current.options[option])) {
+              requiredDocuments.push(...current.options[option]);
+            } else if (current.options[option] && current.options[option].subQuestion) {
+              showSubQuestion(current.options[option].subQuestion, current.options[option].options);
+              return;
+            }
+            if (!current.nextIf || current.nextIf(option)) {
+              currentQuestion++;
+              loadQuestion();
+            }
+          };
+          optionsEl.appendChild(button);
+        });
+      } else {
+        showSummary();
+      }
+    }
+
+    function showSubQuestion(question, options) {
+      questionEl.textContent = question;
+      optionsEl.innerHTML = '';
+      Object.keys(options).forEach((option) => {
+        const button = document.createElement('button');
+        button.textContent = option;
+        button.onclick = () => {
+          answers.push(option);
+          if (Array.isArray(options[option])) {
+            requiredDocuments.push(...options[option]);
+          }
+          loadQuestion();
+        };
+        optionsEl.appendChild(button);
+      });
+    }
+
+    function showDisqualificationMessage() {
+      questionEl.textContent = "You are not qualified under any circumstances.";
+      optionsEl.style.display = 'none';
+      summaryEl.style.display = 'block';
+      summaryEl.innerHTML = "<p>Please review your eligibility criteria and try again if circumstances change.</p>";
+    }
+
+    function showSummary() {
+      questionEl.textContent = "Thank you for completing the questionnaire!";
+      optionsEl.style.display = 'none';
+      summaryEl.style.display = 'block';
+
+      let summaryText = `<strong>Name:</strong> ${userName}<br><strong>Surname:</strong> ${userSurname}<br><br>`;
+      summaryText += "<strong>Your Answers:</strong><br><ul>";
+      answers.forEach((answer, index) => {
+        summaryText += `<li>${questions[index].question} <strong>${answer}</strong></li>`;
+      });
+      summaryText += "</ul>";
+
+      summaryText += "<strong>Required Documents:</strong><br><ul>";
+      const uniqueDocs = [...new Set(requiredDocuments)];
+      uniqueDocs.forEach((doc) => {
+        summaryText += `<li>${doc}</li>`;
+      });
+      summaryText += "</ul>";
+
+      summaryText += `<button onclick="downloadSummary()" style="margin-top: 20px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Download Summary</button>`;
+
+      summaryEl.innerHTML = summaryText;
+    }
+
+    function downloadSummary() {
+      const data = `Name: ${userName}\nSurname: ${userSurname}\n\nAnswers:\n` +
+        answers.map((answer, index) => `${questions[index].question}: ${answer}`).join("\n") +
+        "\n\nRequired Documents:\n" +
+        [...new Set(requiredDocuments)].join("\n");
+
+      const blob = new Blob([data], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'summary.txt';
+      link.click();
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
