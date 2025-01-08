@@ -70,13 +70,19 @@
       {
         question: "What is the EPC rating of your house?",
         options: {
-          "C or above": "You are not qualified.",
-          "D": null,
-          "E": null,
-          "F": null,
-          "G": null
+          "C or above": "You are not qualified under any circumstances.",
+          "D": [],
+          "E": [],
+          "F": [],
+          "G": []
         },
-        nextIf: (answer) => answer !== "C or above"
+        nextIf: (answer) => {
+          if (answer === "C or above") {
+            showDisqualificationMessage();
+            return false;
+          }
+          return true;
+        }
       },
       {
         question: "What is the status of your home?",
@@ -84,40 +90,35 @@
           "Social rented": ["EPC rating of D-G", "Verification for property rented below market rate"],
           "Private rented": ["Permission from landlord", "EPC rating E-G"],
           "Owner": ["EPC rating of D-G"]
-        },
-        requiredInfo: true
+        }
       },
       {
         question: "What is your income?",
         options: {
           "Below £31,000": ["Bank statement"],
           "Above £31,000": []
-        },
-        requiredInfo: true
+        }
       },
       {
         question: "Do you have NHS referral?",
         options: {
           "Yes": ["Declaration from doctor"],
           "No": []
-        },
-        requiredInfo: true
+        }
       },
       {
         question: "Do you live in LSOA?",
         options: {
           "Yes": ["Council tax bill"],
           "No": []
-        },
-        requiredInfo: true
+        }
       },
       {
         question: "Did you get a tax reduction?",
         options: {
           "Yes": ["Tax bill"],
           "No": []
-        },
-        requiredInfo: true
+        }
       },
       {
         question: "Are you or your household vulnerable to cold?",
@@ -133,24 +134,21 @@
             }
           },
           "No": []
-        },
-        requiredInfo: true
+        }
       },
       {
         question: "Do you have a child that gets free meals at school?",
         options: {
           "Yes": ["Letter from school"],
           "No": []
-        },
-        requiredInfo: true
+        }
       },
       {
         question: "Are you struggling to pay bills?",
         options: {
           "Yes": ["Referral letter"],
           "No": []
-        },
-        requiredInfo: true
+        }
       }
     ];
 
@@ -171,14 +169,13 @@
             answers.push(option);
             if (Array.isArray(current.options[option])) {
               requiredDocuments.push(...current.options[option]);
-            }
-            if (current.options[option] && current.options[option].subQuestion) {
+            } else if (current.options[option] && current.options[option].subQuestion) {
               showSubQuestion(current.options[option].subQuestion, current.options[option].options);
-            } else if (!current.nextIf || current.nextIf(option)) {
+              return;
+            }
+            if (!current.nextIf || current.nextIf(option)) {
               currentQuestion++;
               loadQuestion();
-            } else {
-              showSummary();
             }
           };
           optionsEl.appendChild(button);
@@ -202,6 +199,13 @@
         };
         optionsEl.appendChild(button);
       });
+    }
+
+    function showDisqualificationMessage() {
+      questionEl.textContent = "You are not qualified under any circumstances.";
+      optionsEl.style.display = 'none';
+      summaryEl.style.display = 'block';
+      summaryEl.innerHTML = "<p>Please review your eligibility criteria and try again if circumstances change.</p>";
     }
 
     function showSummary() {
